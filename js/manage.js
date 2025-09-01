@@ -12,15 +12,15 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     } catch (e) {
       console.error("Invalid token", e);
-      window.location.href = `${SERVER_ENDPOINT}/auth_page.html`;
+      window.location.href = `/auth_page.html`;
     }
   } else {
-    window.location.href = `${SERVER_ENDPOINT}/auth_page.html`; 
+    window.location.href = `/auth_page.html`; 
 }
 
   if (!portfolioId) {
     showModal("Error fetching portfolio.", "error");
-    window.location.href = `${SERVER_ENDPOINT}/index.html`;
+    window.location.href = `/index.html`;
     return;
   }
 

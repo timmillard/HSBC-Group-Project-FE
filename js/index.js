@@ -10,7 +10,7 @@ if (token) {
     console.error("Invalid token", e);
   }
 } else {
-  window.location.href = `${SERVER_ENDPOINT}/auth_page.html`;
+  window.location.href = `/auth_page.html`;
 }
 
 const portfolioIds = [];
@@ -208,7 +208,7 @@ function managePortfolio(id, name, exchange) {
   localStorage.setItem("portfolioId", id);
   localStorage.setItem("portfolioName", name);
   localStorage.setItem("portfolioExchange", exchange);
-  window.location.href = "manage.html";
+  window.location.href = "/manage.html";
 }
 
 // Adds new portfolio and updates table accordingly

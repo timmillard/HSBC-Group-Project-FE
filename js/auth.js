@@ -18,7 +18,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     .then(data => {
         if (data.success) {
             localStorage.setItem('token', data.token);
-            window.location.href = `${SERVER_ENDPOINT}/index.html`;
+            window.location.href = `/index.html`;
         } else {
             alert('Login failed: ' + (data.message || 'Unknown error.'));
         }
