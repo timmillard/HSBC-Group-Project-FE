@@ -135,32 +135,25 @@
         </div>
       </div>
 
-      <div class="row mt-4">
-        <div class="col-md-4 mb-3">
-          <div class="card text-center border-dark shadow-sm h-100 bg-dark text-light">
-            <div class="card-body py-3 d-flex flex-column justify-content-center">
-              <h5 class="card-title text-light">Portfolio Value</h5>
-              <h2 id="portfolioValue" class="fw-bold text-info">$0</h2>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-8 mb-3">
-          <div class="card border-dark shadow-sm h-100 bg-dark text-light">
-            <div class="card-body">
-              <h5 class="card-title text-light">Portfolio Stats</h5>
-              <div class="row text-center mt-3">
-                <div class="col-4">
-                  <h6 class="text-muted">Stocks</h6>
-                  <p id="portfolioStockCount" class="fw-bold">0</p>
+      <div class="row mt-2 mb-4">
+        <!-- Slim Net Worth header card -->
+        <div class="container mt-3">
+          <div class="card border-0 shadow-sm bg-dark text-light networth-card">
+            <div class="card-body py-3">
+              <div class="row g-3 align-items-center">
+                <div class="col-12 col-md-6">
+                  <div class="stat-label mb-1"><strong>Current Net Worth</strong></div>
+                  <h5 id="portfolioValue" class="stat-value stat-main text-info">$0</h5>
                 </div>
-                <div class="col-4">
-                  <h6 class="text-muted">Last Week</h6>
-                  <p id="portfolioChangeWeek" class="fw-bold">0%</p>
+                <div class="col-6 col-md-3">
+                  <div class="stat-label mb-1"><strong>Last Week</strong></div>
+                  <div id="weekChangeValue" class="stat-value">—</div>
+                  <div id="weekChangeValueDollars" class="text-muted"></div>
                 </div>
-                <div class="col-4">
-                  <h6 class="text-muted">Last Year</h6>
-                  <p id="portfolioChangeYear" class="fw-bold">0%</p>
+                <div class="col-6 col-md-3">
+                  <div class="stat-label mb-1"><strong>Last Month</strong></div>
+                  <div id="monthChangeValue" class="stat-value">—</div>
+                  <div id="monthChangeValueDollars" class="text-muted"></div>
                 </div>
               </div>
             </div>

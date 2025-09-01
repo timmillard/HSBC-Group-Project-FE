@@ -106,10 +106,18 @@ document.addEventListener("DOMContentLoaded", function () {
       const sign = avgChange >= 0 ? "+" : "";
       const cls = avgChange >= 0 ? "order-buy" : "order-sell";
 
-      document.getElementById("portfolioChangeWeek").innerHTML =
+      document.getElementById("weekChangeValue").innerHTML =
         `<span class="${cls}">${sign}${avgChange}%</span>`;
 
-      document.getElementById("portfolioStockCount").textContent = totalStocks;
+      // Set weekChangeValueDollars to avgChange * portfolio value
+      const weekChangeValueDollarsEl = document.getElementById("weekChangeValueDollars");
+      const portfolioValueEl = document.getElementById("portfolioValue");
+      if (weekChangeValueDollarsEl && portfolioValueEl) {
+        const portfolioValue = Number(portfolioValueEl.innerText.replace(/[^\d.]/g, ""));
+        const dollarChange = (portfolioValue * (parseFloat(avgChange) / 100)).toFixed(2);
+        weekChangeValueDollarsEl.innerText = `$${dollarChange}`;
+      }
+
     }
   
 
@@ -126,14 +134,21 @@ document.addEventListener("DOMContentLoaded", function () {
       if (data.dates && data.values) {
         renderCumulativeGrowthChart(data.dates, data.values);
         const latest = data.values[data.values.length - 1]; 
-        const first = data.values[data.values.length - 12];                     
-        const yearlyChange = ((latest - first) / first) * 100;
+        const first = data.values[data.values.length - 2]; // last month
+        const monthlyChange = ((latest - first) / first) * 100;
 
         document.getElementById("portfolioValue").innerText = `$${latest.toLocaleString()}`;
 
-        const el = document.getElementById("portfolioChangeYear");
-        el.innerHTML = `${yearlyChange >= 0 ? "+" : ""}${yearlyChange.toFixed(2)}%`;
-        el.classList.add(yearlyChange >= 0 ? "order-buy" : "order-sell");
+        const el = document.getElementById("monthChangeValue");
+        if (el) {
+          el.innerHTML = `${monthlyChange >= 0 ? "+" : ""}${monthlyChange.toFixed(2)}%`;
+          el.classList.add(monthlyChange >= 0 ? "order-buy" : "order-sell");
+        }
+        const monthChangeValueDollarsEl = document.getElementById("monthChangeValueDollars");
+        if (monthChangeValueDollarsEl) {
+          const dollarChange = (latest * (monthlyChange / 100)).toFixed(2);
+          monthChangeValueDollarsEl.innerText = `$${dollarChange}`;
+        }
       } else {
         console.error("Invalid data structure for cumulative portfolio value");
       }
