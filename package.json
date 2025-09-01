@@ -16,8 +16,8 @@
     "url": "https://github.com/timmillard/HSBC-Group-Project-FE/issues"
   },
   "homepage": "https://github.com/timmillard/HSBC-Group-Project-FE#readme",
-  "description": "",
   "devDependencies": {
     "serve": "^14.2.4"
-  }
+  },
+  "description": ""
 }
