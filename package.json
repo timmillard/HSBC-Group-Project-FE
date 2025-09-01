@@ -1,0 +1,23 @@
+{
+  "name": "hsbc-group-project-fe",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timmillard/HSBC-Group-Project-FE.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/timmillard/HSBC-Group-Project-FE/issues"
+  },
+  "homepage": "https://github.com/timmillard/HSBC-Group-Project-FE#readme",
+  "description": "",
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}
