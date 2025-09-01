@@ -175,8 +175,9 @@ function loadTransactions() {
         // NEW: ticker cell first
         const tickerCell = newRow.insertCell(0);
         const transactionType = newRow.insertCell(1);
-        const quantity = newRow.insertCell(2);
-        const dateTime = newRow.insertCell(3);
+        const purchasePrice = newRow.insertCell(2)
+        const quantity = newRow.insertCell(3);
+        const dateTime = newRow.insertCell(4);
 
         // Lookup ticker via the portfolio_asset_id
         const ticker =
@@ -191,6 +192,7 @@ function loadTransactions() {
         if (type === "BUY") transactionType.classList.add("order-buy");
         else if (type === "SELL") transactionType.classList.add("order-sell");
 
+        purchasePrice.textContent = "$" + p.purchase_price;
         quantity.textContent = p.quantity;
         dateTime.textContent = date;
       });
