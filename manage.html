@@ -53,22 +53,15 @@
       }
 
       .ticker__track {
-        display: inline-flex;
+        display: flex;
         gap: 3rem;
         padding: 0.5rem 1rem;
-        white-space: nowrap;
-        will-change: transform;
-        animation: ticker-scroll var(--duration, 24s) linear infinite;
+        white-space: normal;
+        will-change: auto;
+        animation: none;
       }
 
-      @keyframes ticker-scroll {
-        from {
-          transform: translateX(0);
-        }
-        to {
-          transform: translateX(-50%);
-        }
-      }
+  /* Removed ticker-scroll animation for static ticker */
 
       .ticker-item {
         display: flex;
@@ -136,8 +129,9 @@
       </div>
 
       <div class="mb-3">
-        <div class="ticker">
-          <div class="ticker__track" id="weeklyTickerTrack"></div>
+        <div class="ticker" style="display: flex; align-items: center; padding-left: 1.5rem;">
+          <span class="fw-bold text-primary" style="font-size: 1.1rem; margin-right: 1.5rem; min-width: 120px;">Weekly Updates:</span>
+          <div class="ticker__track" id="weeklyTickerTrack" style="flex: 1;"></div>
         </div>
       </div>
 
