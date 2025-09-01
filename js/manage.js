@@ -32,32 +32,31 @@ document.addEventListener("DOMContentLoaded", function () {
       portfolioExchange;
   }
 
-  async function buildWeeklyTicker() {
-    const track = document.getElementById("weeklyTickerTrack");
-  
-    const res = await fetch(
-      `${SERVER_ENDPOINT}/portfolio/portfolio/getWeeklyChange/${portfolioId}`,
-      {
-        headers: { Authorization: "Bearer " + token },
+    async function buildWeeklyTicker() {
+      const track = document.getElementById("weeklyTickerTrack");
+
+      const res = await fetch(
+        `${SERVER_ENDPOINT}/portfolio/portfolio/getWeeklyChange/${portfolioId}`,
+        {
+          headers: { Authorization: "Bearer " + token },
+        }
+      );
+      if (!res.ok) return;
+
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        track.innerHTML = '<div class="ticker-item">No assets yet</div>';
+        return;
       }
-    );
-    if (!res.ok) return;
-  
-    const data = await res.json();
-    if (!Array.isArray(data) || data.length === 0) {
-      track.innerHTML = '<div class="ticker-item">No assets yet</div>';
-      return;
-    }
-  
-    let lastWeekChangeTotal = 0;   
-    let totalStocks = 0;
-  
-    const itemsHTML = data
-      .map(({ ticker, changePct }) => {
+
+      let lastWeekChangeTotal = 0;   
+      let totalStocks = 0;
+
+      const items = data.map(({ ticker, changePct }) => {
         const pct = Number(changePct);
         lastWeekChangeTotal += pct;   
         totalStocks += 1;
-  
+
         const pctStr = pct.toFixed(2);
         const up = pct >= 0;
         const cls = up ? "badge-up" : "badge-down";
@@ -66,28 +65,52 @@ document.addEventListener("DOMContentLoaded", function () {
             <span class="symbol">${ticker}</span>
             <span class="${cls}">${sign}${pctStr}%</span>
           </div>`;
-      })
-      .join("");
-  
-    let avgChange = totalStocks > 0 ? (lastWeekChangeTotal / totalStocks).toFixed(2) : "0.00";
-    const sign = avgChange >= 0 ? "+" : "";
-    const cls = avgChange >= 0 ? "order-buy" : "order-sell";
-  
-    document.getElementById("portfolioChangeWeek").innerHTML =
-      `<span class="${cls}">${sign}${avgChange}%</span>`;
-  
-    document.getElementById("portfolioStockCount").textContent = totalStocks;
-  
-    let repeated = itemsHTML;
-    while (track.scrollWidth < window.innerWidth * 2) {
-      repeated += itemsHTML;
-      track.innerHTML = repeated;
+      });
+
+
+      // Display items in rows, swapping to a new row every 10 seconds
+      const itemsPerRow = 6;
+      let currentRow = 0;
+      let isAnimating = false;
+      function showCurrentRow() {
+        if (isAnimating) return;
+        isAnimating = true;
+        // Slide out current row
+        track.classList.remove('slide-in');
+        track.classList.add('slide-out');
+        setTimeout(() => {
+          // After slide out, show new row and slide in
+          const start = currentRow * itemsPerRow;
+          const end = start + itemsPerRow;
+          const rowItems = items.slice(start, end);
+          track.innerHTML = rowItems.join("");
+          track.classList.remove('slide-out');
+          track.classList.add('slide-in');
+          currentRow = (currentRow + 1) % Math.ceil(items.length / itemsPerRow);
+          setTimeout(() => {
+            track.classList.remove('slide-in');
+            isAnimating = false;
+          }, 500); // slide-in duration
+        }, 500); // slide-out duration
+      }
+
+      // Initial row
+      const start = currentRow * itemsPerRow;
+      const end = start + itemsPerRow;
+      track.innerHTML = items.slice(start, end).join("");
+      currentRow = (currentRow + 1) % Math.ceil(items.length / itemsPerRow);
+
+      setInterval(showCurrentRow, 10000);
+
+      let avgChange = totalStocks > 0 ? (lastWeekChangeTotal / totalStocks).toFixed(2) : "0.00";
+      const sign = avgChange >= 0 ? "+" : "";
+      const cls = avgChange >= 0 ? "order-buy" : "order-sell";
+
+      document.getElementById("portfolioChangeWeek").innerHTML =
+        `<span class="${cls}">${sign}${avgChange}%</span>`;
+
+      document.getElementById("portfolioStockCount").textContent = totalStocks;
     }
-  
-    const itemCount = track.querySelectorAll(".ticker-item").length;
-    const duration = Math.min(60, Math.max(18, itemCount * 2.5));
-    track.style.setProperty("--duration", `${duration}s`);
-  }
   
 
   buildWeeklyTicker();
