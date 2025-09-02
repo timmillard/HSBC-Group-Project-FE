@@ -117,8 +117,13 @@ async function buildNetWorthChart() {
     options: {
       responsive: true,
       scales: {
-        x: { type: "category", title: { display: true, text: "Date" } },
-        y: { title: { display: true, text: "Net Worth (GBP)" } },
+        x: { type: "category", scaleLabel: { display: true, text: "Date" } },
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: "Net Worth (USD)"
+          }
+        }]
       },
       plugins: { legend: { display: true, position: "top" } },
     },

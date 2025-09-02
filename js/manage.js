@@ -272,12 +272,13 @@ function renderCumulativeGrowthChart(dates, values) {
             minRotation: 45,
           },
         },
-        y: {
-          title: {
+        yAxes: [{
+          scaleLabel: {
             display: true,
-            text: "Net Worth (GBP)",
-          },
-        },
+            labelString: "Net Worth (GBP)"
+          }
+        }]
+        ,
       },
       plugins: {
         legend: {
