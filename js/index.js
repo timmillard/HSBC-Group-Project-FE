@@ -17,6 +17,12 @@ const portfolioIds = [];
 const portfolioNames = {};
 const assetTickers = {};
 let chart = null;
+// format numbers to 2dp with thousand separators
+const fmt2 = (n) =>
+  Number(n || 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
 
 // Fetch user portfolio IDs
@@ -30,7 +36,6 @@ fetch(`${SERVER_ENDPOINT}/userPortfolio/userPortfolio`, {
     fetchPortfolioDetails();
   })
   .catch((err) => console.error("Error fetching user portfolio IDs:", err));
-
 
 function fetchPortfolioDetails() {
   fetch(`${SERVER_ENDPOINT}/portfolio/portfolio`, {
@@ -58,7 +63,6 @@ function fetchPortfolioDetails() {
     })
     .catch((err) => console.error("Error fetching portfolio details:", err));
 }
-
 
 // Build chart with union of dates across portfolios
 async function buildNetWorthChart() {
@@ -146,7 +150,6 @@ function reindexWithCarryForward(unionDates, dates, values) {
   return out;
 }
 
-
 // Populate portfolio table
 const table = document
   .getElementById("portfolioTable")
@@ -166,13 +169,11 @@ fetch(`${SERVER_ENDPOINT}/portfolio/portfolio`, {
         const pName = newRow.insertCell(0);
         const pExchange = newRow.insertCell(1);
         const pValue = newRow.insertCell(2);
-        const pChange = newRow.insertCell(3);
-        const manageButton = newRow.insertCell(4);
+        const manageButton = newRow.insertCell(3);
 
         pName.textContent = p.name;
         pExchange.textContent = p.exchange;
         pValue.textContent = "-";
-        pChange.textContent = "-";
         manageButton.innerHTML = `<button class="btn btn-outline-dark" onclick="managePortfolio(${p.id}, '${p.name}', '${p.exchange}')">Manage</button>`;
 
         // Fetch current portfolio value
@@ -184,7 +185,7 @@ fetch(`${SERVER_ENDPOINT}/portfolio/portfolio`, {
           const valueData = await res.json();
           if (valueData?.values?.length) {
             const latestValue = valueData.values[valueData.values.length - 1];
-            pValue.textContent = `$${latestValue.toLocaleString()}`;
+            pValue.textContent = `$${fmt2(latestValue)}`
             totalNetWorth += Number(latestValue);
           } else {
             pValue.textContent = "-";
@@ -193,39 +194,16 @@ fetch(`${SERVER_ENDPOINT}/portfolio/portfolio`, {
           console.error("Error fetching portfolio value:", err);
           pValue.textContent = "-";
         }
-
-        // Fetch weekly change %
-        try {
-          const res = await fetch(
-            `${SERVER_ENDPOINT}/portfolio/portfolio/getWeeklyChange/${p.id}`,
-            { headers: { Authorization: "Bearer " + token } }
-          );
-          const changeData = await res.json();
-          if (Array.isArray(changeData) && changeData.length > 0) {
-            const avgChange =
-              changeData.reduce((acc, item) => acc + (item.changePct || 0), 0) /
-              changeData.length;
-            const sign = avgChange >= 0 ? "+" : "";
-            pChange.textContent = `${sign}${avgChange.toFixed(2)}%`;
-            pChange.classList.add(avgChange >= 0 ? "order-buy" : "order-sell");
-          } else {
-            pChange.textContent = "-";
-          }
-        } catch (err) {
-          console.error("Error fetching weekly change:", err);
-          pChange.textContent = "-";
-        }
       })
     );
 
     // Update the Net Worth card once everything is done
     const netWorthEl = document.getElementById("netWorthValue");
     if (netWorthEl) {
-      netWorthEl.textContent = `$${totalNetWorth.toLocaleString()}`;
+      netWorthEl.textContent = `$${fmt2(totalNetWorth)}`
     }
   })
   .catch((err) => console.error("Error fetching portfolio details:", err));
-
 
 // helper for manage page navigation
 function managePortfolio(id, name, exchange) {
@@ -266,13 +244,11 @@ document
         const pName = newRow.insertCell(0);
         const pExchange = newRow.insertCell(1);
         const pValue = newRow.insertCell(2);
-        const pChange = newRow.insertCell(3);
-        const manageButton = newRow.insertCell(4);
+        const manageButton = newRow.insertCell(3);
 
         pName.textContent = newPortfolio.name;
         pExchange.textContent = newPortfolio.exchange;
         pValue.textContent = "-";
-        pChange.textContent = "-";
         manageButton.innerHTML = `<button class="btn btn-outline-dark" onclick="managePortfolio(${newPortfolio.id}, '${newPortfolio.name}', '${newPortfolio.exchange}')">Manage</button>`;
 
         // Fetch and update value
@@ -283,23 +259,7 @@ document
           .then(valueData => {
             if (valueData?.values?.length) {
               const latestValue = valueData.values[valueData.values.length - 1];
-              pValue.textContent = `$${latestValue.toLocaleString()}`;
-            }
-          });
-
-        // Fetch and update weekly change
-        fetch(`${SERVER_ENDPOINT}/portfolio/portfolio/getWeeklyChange/${newPortfolio.id}`, {
-          headers: { Authorization: "Bearer " + token }
-        })
-          .then(res => res.json())
-          .then(changeData => {
-            if (Array.isArray(changeData) && changeData.length > 0) {
-              const avgChange =
-                changeData.reduce((acc, item) => acc + (item.changePct || 0), 0) /
-                changeData.length;
-              const sign = avgChange >= 0 ? "+" : "";
-              pChange.textContent = `${sign}${avgChange.toFixed(2)}%`;
-              pChange.classList.add(avgChange >= 0 ? "order-buy" : "order-sell");
+              pValue.textContent = `$${fmt2(latestValue)}`
             }
           });
 
@@ -312,8 +272,6 @@ document
       .catch(err => console.error("Error adding portfolio:", err));
   });
 
-
-// Update Transaction Table
 // Update Transaction Table (most recent first)
 function fetchTransactions() {
   const table2 = document

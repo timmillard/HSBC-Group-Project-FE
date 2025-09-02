@@ -106,57 +106,41 @@ document.addEventListener("DOMContentLoaded", function () {
       const sign = avgChange >= 0 ? "+" : "";
       const cls = avgChange >= 0 ? "order-buy" : "order-sell";
 
-      document.getElementById("weekChangeValue").innerHTML =
-        `<span class="${cls}">${sign}${avgChange}%</span>`;
-
-      // Set weekChangeValueDollars to avgChange * portfolio value
-      const weekChangeValueDollarsEl = document.getElementById("weekChangeValueDollars");
-      const portfolioValueEl = document.getElementById("portfolioValue");
-      if (weekChangeValueDollarsEl && portfolioValueEl) {
-        const portfolioValue = Number(portfolioValueEl.innerText.replace(/[^\d.]/g, ""));
-        const dollarChange = (portfolioValue * (parseFloat(avgChange) / 100)).toFixed(2);
-        weekChangeValueDollarsEl.innerText = `$${dollarChange}`;
-      }
-
     }
   
 
   buildWeeklyTicker();
 
   // Fetch the cumulative portfolio data for the line chart
-  fetch(`${SERVER_ENDPOINT}/portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`, {
-    headers: {
-      Authorization: "Bearer " + token,
-    },
+  // Fetch the cumulative portfolio data for the line chart
+// Fetch the cumulative portfolio data for the line chart
+fetch(`${SERVER_ENDPOINT}/portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`, {
+  headers: { Authorization: "Bearer " + token },
+})
+  .then((response) => response.json())
+  .then((data) => {
+    if (!Array.isArray(data?.dates) || !Array.isArray(data?.values) || !data.values.length) {
+      console.error("Invalid data structure for cumulative portfolio value", data);
+      return;
+    }
+
+    // Keep the chart
+    renderCumulativeGrowthChart(data.dates, data.values);
+
+    // Only set Current Net Worth
+    const latest = Number(data.values[data.values.length - 1]);
+    const pvEl = document.getElementById("portfolioValue");
+    if (pvEl) {
+      pvEl.textContent = `$${latest.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+    }
   })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.dates && data.values) {
-        renderCumulativeGrowthChart(data.dates, data.values);
-        const latest = data.values[data.values.length - 1]; 
-        const first = data.values[data.values.length - 2]; // last month
-        const monthlyChange = ((latest - first) / first) * 100;
+  .catch((error) => {
+    console.error("Error fetching cumulative portfolio data:", error);
+    showModal && showModal("Failed to load portfolio data.", "error");
+  });
 
-        document.getElementById("portfolioValue").innerText = `$${latest.toLocaleString()}`;
 
-        const el = document.getElementById("monthChangeValue");
-        if (el) {
-          el.innerHTML = `${monthlyChange >= 0 ? "+" : ""}${monthlyChange.toFixed(2)}%`;
-          el.classList.add(monthlyChange >= 0 ? "order-buy" : "order-sell");
-        }
-        const monthChangeValueDollarsEl = document.getElementById("monthChangeValueDollars");
-        if (monthChangeValueDollarsEl) {
-          const dollarChange = (latest * (monthlyChange / 100)).toFixed(2);
-          monthChangeValueDollarsEl.innerText = `$${dollarChange}`;
-        }
-      } else {
-        console.error("Invalid data structure for cumulative portfolio value");
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching cumulative portfolio data:", error);
-      showModal("Failed to load portfolio data.", "error");
-    });
+
 
 // Map: portfolio_asset_id -> ticker
 let assetIdToTicker = {};
